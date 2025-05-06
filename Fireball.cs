@@ -34,12 +34,24 @@ namespace Monogame_7___Vectors_and_Rotation
         public Rectangle Rect
         {
             get { return _rect; }
+            set { _rect = value; }
         }
 
         public void Update()
         {
             _location += _direction * _speed;
             _rect.Location = _location.ToPoint();
+
+            //if (_rect.Size != Point.Zero)
+            //{
+            //    _rect.Size -= new Point(1, 1);
+            //}
+            //else
+            //{
+            //    _rect.Size = Point.Zero;
+            //}
+
+
         }
 
         public void Draw(SpriteBatch spriteBatch)

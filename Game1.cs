@@ -51,12 +51,13 @@ namespace Monogame_7___Vectors_and_Rotation
 
             if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
             {
-                fireballs.Add(new Fireball(fireballTexture, tankRect.Center.ToVector2(), mouseState.Position.ToVector2(), 10));
+                fireballs.Add(new Fireball(fireballTexture, tankRect.Center.ToVector2(), mouseState.Position.ToVector2(), 30));
             }
 
             for (int i = 0; i < fireballs.Count; i++)
             {
                 fireballs[i].Update();
+                
                 if (!window.Intersects(fireballs[i].Rect))
                 {
                     fireballs.RemoveAt(i);
