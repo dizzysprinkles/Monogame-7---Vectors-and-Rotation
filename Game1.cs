@@ -10,10 +10,14 @@ namespace Monogame_7___Vectors_and_Rotation
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        Texture2D tankTexture, fireballTexture;
-        Rectangle tankRect, window;
-        Vector2 tankLocation;
+        Texture2D tankTexture, fireballTexture, shipTexture, rectTexture;
+        Rectangle tankRect, window, shipRect;
         MouseState mouseState, prevMouseState;
+
+        float shipAngle, shipSpeed;
+        Vector2 shipPosition, shipDirection;
+        KeyboardState keyboardState, prevKeyboardState;
+
 
         List<Fireball> fireballs;
 
@@ -31,6 +35,14 @@ namespace Monogame_7___Vectors_and_Rotation
             tankRect = new Rectangle(350, 250, 75, 75);
             window = new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
 
+            shipAngle = 0;
+            shipSpeed = 2;
+            shipPosition = new Vector2(100,100);
+
+            shipRect = new Rectangle(shipPosition.ToPoint(), new Point(50,50));
+
+            shipDirection = Vector2.Zero;
+
             base.Initialize();
         }
 
@@ -40,32 +52,50 @@ namespace Monogame_7___Vectors_and_Rotation
 
             tankTexture = Content.Load<Texture2D>("Images/tank");
             fireballTexture = Content.Load<Texture2D>("Images/fireball");
+            shipTexture = Content.Load<Texture2D>("Images/enterprise");
+            rectTexture = Content.Load<Texture2D>("Images/rectangle");
         }
 
         protected override void Update(GameTime gameTime)
         {
             mouseState = Mouse.GetState();
+            keyboardState = Keyboard.GetState();
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+
+            //Angular motion
+            //if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+            //{
+            //    fireballs.Add(new Fireball(fireballTexture, tankRect.Center.ToVector2(), mouseState.Position.ToVector2(), 30));
+            //}
+
+            //for (int i = 0; i < fireballs.Count; i++)
+            //{
+            //    fireballs[i].Update();
+                
+            //    if (!window.Intersects(fireballs[i].Rect))
+            //    {
+            //        fireballs.RemoveAt(i);
+            //        i--;
+            //    }
+            //}
+
+            //Rotating w/Keyboard
+
+            if (keyboardState.IsKeyDown(Keys.Left) && prevKeyboardState.IsKeyUp(Keys.Left))
             {
-                fireballs.Add(new Fireball(fireballTexture, tankRect.Center.ToVector2(), mouseState.Position.ToVector2(), 30));
+                shipAngle -= 0.1f;
             }
 
-            for (int i = 0; i < fireballs.Count; i++)
+            if (keyboardState.IsKeyDown(Keys.Right) && prevKeyboardState.IsKeyUp(Keys.Right))
             {
-                fireballs[i].Update();
-                
-                if (!window.Intersects(fireballs[i].Rect))
-                {
-                    fireballs.RemoveAt(i);
-                    i--;
-                }
+                shipAngle += 0.1f;
             }
 
             prevMouseState = mouseState;
+            prevKeyboardState = keyboardState;
             base.Update(gameTime);
         }
 
@@ -79,6 +109,11 @@ namespace Monogame_7___Vectors_and_Rotation
 
             foreach (Fireball fireball in fireballs)
                 fireball.Draw(_spriteBatch);
+
+
+            _spriteBatch.Draw(rectTexture, shipRect, Color.Red); //Just to show where the ship is rotating around....
+            _spriteBatch.Draw(shipTexture, new Rectangle(shipRect.Center, shipRect.Size), null, Color.White, shipAngle, new Vector2(shipTexture.Width / 2, shipTexture.Height / 2), SpriteEffects.None, 1f);
+
             _spriteBatch.End();
 
             base.Draw(gameTime);
