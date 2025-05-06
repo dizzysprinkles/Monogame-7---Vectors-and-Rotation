@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace Monogame_7___Vectors_and_Rotation
 {
@@ -8,6 +9,13 @@ namespace Monogame_7___Vectors_and_Rotation
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+
+        Texture2D tankTexture, fireballTexture;
+        Rectangle tankRect, window;
+        Vector2 tankLocation;
+        MouseState mouseState, prevMouseState;
+
+        List<Fireball> fireballs;
 
         public Game1()
         {
@@ -18,7 +26,10 @@ namespace Monogame_7___Vectors_and_Rotation
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            fireballs = new List<Fireball>();
+
+            tankRect = new Rectangle(350, 250, 75, 75);
+            window = new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
 
             base.Initialize();
         }
@@ -27,16 +38,33 @@ namespace Monogame_7___Vectors_and_Rotation
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            tankTexture = Content.Load<Texture2D>("Images/tank");
+            fireballTexture = Content.Load<Texture2D>("Images/fireball");
         }
 
         protected override void Update(GameTime gameTime)
         {
+            mouseState = Mouse.GetState();
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+            {
+                fireballs.Add(new Fireball(fireballTexture, tankRect.Center.ToVector2(), mouseState.Position.ToVector2(), 10));
+            }
 
+            for (int i = 0; i < fireballs.Count; i++)
+            {
+                fireballs[i].Update();
+                if (!window.Intersects(fireballs[i].Rect))
+                {
+                    fireballs.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            prevMouseState = mouseState;
             base.Update(gameTime);
         }
 
@@ -44,7 +72,13 @@ namespace Monogame_7___Vectors_and_Rotation
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+
+            _spriteBatch.Draw(tankTexture, tankRect, Color.White);
+
+            foreach (Fireball fireball in fireballs)
+                fireball.Draw(_spriteBatch);
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
