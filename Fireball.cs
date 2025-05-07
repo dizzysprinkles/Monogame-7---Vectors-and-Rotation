@@ -26,7 +26,7 @@ namespace Monogame_7___Vectors_and_Rotation
             _rect = new Rectangle(location.ToPoint(), new Point(_size, _size));
             _direction = target - location;   // Determines the direction it's facing (pointing from location to target)
             _direction.Normalize(); // Converts to a unit vector!
-            _speed = 2f;
+            _speed = 1f;
 		}
 
 
